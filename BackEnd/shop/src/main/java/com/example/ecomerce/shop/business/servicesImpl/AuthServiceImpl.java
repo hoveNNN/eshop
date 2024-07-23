@@ -16,8 +16,6 @@ import com.example.ecomerce.shop.web.dto.UserDto;
 public class AuthServiceImpl implements AuthService {
         @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
     public UserDto  createUser(SignupRequest signupRequest){
         User user = new User();
         user.setEmail(signupRequest.getEmail());
