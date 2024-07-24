@@ -1,6 +1,5 @@
 package com.example.ecomerce.shop.business.servicesImpl;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,30 +13,32 @@ import com.example.ecomerce.shop.web.dto.UserDto;
 
 @Service
 public class AuthServiceImpl implements AuthService {
-        @Autowired
+    @Autowired
     private UserRepository userRepository;
-    public UserDto  createUser(SignupRequest signupRequest){
+
+    public UserDto createUser(SignupRequest signupRequest){
         User user = new User();
         user.setEmail(signupRequest.getEmail());
         user.setUserName(signupRequest.getName());
-        user.setPassword( new BCryptPasswordEncoder().encode(signupRequest.getPassword()));
+        user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.getPassword()));
         user.setRole(UserRole.Customer);
         User createdUser = userRepository.save(user);
-        UserDto userDto= new UserDto();
-        userDto.setId(createdUser.getId());
+        UserDto userDto = new UserDto(createdUser);
         return userDto;
     }
-    public  Boolean hasUserWithEmail(String email ){
+
+    public Boolean hasUserWithEmail(String email) {
         return userRepository.findFirstByEmail(email).isPresent();
     }
-    public void  createAdminAccount(){
-        User adminAccount=userRepository.findByRole(UserRole.Admin);
-        if (adminAccount==null){
-            User user= new User();
+
+    public void createAdminAccount() {
+        User adminAccount = userRepository.findByRole(UserRole.Admin);
+        if (adminAccount == null) {
+            User user = new User();
             user.setEmail("admin@test.com");
             user.setUserName("admin");
             user.setRole(UserRole.Admin);
-            user.setPassword( new BCryptPasswordEncoder().encode("admin"));
+            user.setPassword(new BCryptPasswordEncoder().encode("admin"));
             userRepository.save(user);
         }
     }

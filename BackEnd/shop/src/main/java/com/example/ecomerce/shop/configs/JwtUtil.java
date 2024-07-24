@@ -1,5 +1,6 @@
 package com.example.ecomerce.shop.configs;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,10 +35,11 @@ public class JwtUtil {
                    .compact();
     }
 
-    private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+private Key getSignKey() {
+    byte[] keyBytes = SECRET.getBytes(StandardCharsets.UTF_8);  // Ensure the secret key is correctly converted to bytes
+    return Keys.hmacShaKeyFor(keyBytes);
+}
+
 
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
