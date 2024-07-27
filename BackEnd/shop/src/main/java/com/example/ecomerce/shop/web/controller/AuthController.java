@@ -42,13 +42,10 @@ public class AuthController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) {
-        System.out.println("Authenticating user: " + authenticationRequest.getEmail()); // Log the email
-    
         try {
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword()));
         } catch (BadCredentialsException e) {
-            System.out.println("Bad credentials: " + authenticationRequest.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("{\"error\":\"Incorrect username or password\"}");
         }
@@ -56,9 +53,6 @@ public class AuthController {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
         Optional<User> user = userRepository.findFirstByEmail(userDetails.getUsername());
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
-    
-        System.out.println("User details: " + userDetails.getUsername());
-        System.out.println("JWT: " + jwt);
     
         if (user.isPresent()) {
             HttpHeaders headers = new HttpHeaders();
@@ -70,7 +64,6 @@ public class AuthController {
                 .headers(headers)
                 .body(userDto);
         } else {
-            System.out.println("User not found: " + authenticationRequest.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("{\"error\":\"User not found\"}");
         }
