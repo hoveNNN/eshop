@@ -12,11 +12,11 @@ public class UserDto {
     private String name;
     private UserRole userRole;
 
-    // Constructor to initialize UserDto from User entity
+  
     public UserDto(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.name = user.getUserName();
-        this.userRole = user.getRole(); // Assuming User entity has a getRole() method
+        this.userRole = user.getRole(); 
     }
 }

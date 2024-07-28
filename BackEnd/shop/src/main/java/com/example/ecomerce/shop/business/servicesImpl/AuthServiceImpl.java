@@ -11,6 +11,8 @@ import com.example.ecomerce.shop.dao.repository.UserRepository;
 import com.example.ecomerce.shop.web.dto.SignupRequest;
 import com.example.ecomerce.shop.web.dto.UserDto;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class AuthServiceImpl implements AuthService {
     @Autowired
@@ -30,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
     public Boolean hasUserWithEmail(String email) {
         return userRepository.findFirstByEmail(email).isPresent();
     }
-
+     @PostConstruct
     public void createAdminAccount() {
         User adminAccount = userRepository.findByRole(UserRole.Admin);
         if (adminAccount == null) {
