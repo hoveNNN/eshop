@@ -1,6 +1,5 @@
 package com.example.ecomerce.shop.web.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -69,21 +68,30 @@ public class AuthController {
         }
     }
 
-
     @PostMapping("/signup")
     public ResponseEntity<?> signupUser(@RequestBody SignupRequest signupRequest) {
+        if (signupRequest.getUserName() == null || signupRequest.getEmail() == null || signupRequest.getPassword() == null || signupRequest.getConfirmPassword() == null) {
+            return new ResponseEntity<>("All fields are required", HttpStatus.BAD_REQUEST);
+        }
+    
         if (userRepository.findFirstByEmail(signupRequest.getEmail()).isPresent()) {
             return new ResponseEntity<>("User already exists", HttpStatus.NOT_ACCEPTABLE);
         }
     
+        if (!signupRequest.getPassword().equals(signupRequest.getConfirmPassword())) {
+            return new ResponseEntity<>("Passwords do not match", HttpStatus.BAD_REQUEST);
+        }
+    
         User user = new User();
         user.setEmail(signupRequest.getEmail());
-        user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.getPassword())); // Ensure password is encoded
-        user.setUserName(signupRequest.getName());
-        user.setRole(UserRole.Customer); // Assuming default role is USER
+        user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.getPassword()));
+        user.setUserName(signupRequest.getUserName());
+        user.setRole(UserRole.Customer); // Assuming default role is CUSTOMER
+    
         userRepository.save(user);
     
         UserDto userDto = new UserDto(user);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
+    
 }

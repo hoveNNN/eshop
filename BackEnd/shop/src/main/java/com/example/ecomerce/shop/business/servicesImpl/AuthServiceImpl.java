@@ -25,24 +25,32 @@ public class AuthServiceImpl implements AuthService {
     private OrderRepository orderRepository;
 
 
-    public UserDto createUser(SignupRequest signupRequest){
+    public UserDto createUser(SignupRequest signupRequest) {
+        if (hasUserWithEmail(signupRequest.getEmail())) {
+            throw new IllegalArgumentException("User already exists with this email");
+        }
+
+        if (!signupRequest.getPassword().equals(signupRequest.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
         User user = new User();
         user.setEmail(signupRequest.getEmail());
-        user.setUserName(signupRequest.getName());
+        user.setUserName(signupRequest.getUserName());
         user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.getPassword()));
         user.setRole(UserRole.Customer);
+
         User createdUser = userRepository.save(user);
 
-        Order order= new Order();
+        Order order = new Order();
         order.setAmount(0L);
         order.setTotalAmount(0L);
-        order.setDisount(0L);
+        order.setDiscount(0L);
         order.setUser(createdUser);
         order.setOrderStatus(OrderStatus.Pending);
         orderRepository.save(order);
 
-        UserDto userDto = new UserDto(createdUser);
-        return userDto;
+        return new UserDto(createdUser);
     }
 
     public Boolean hasUserWithEmail(String email) {

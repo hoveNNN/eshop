@@ -26,8 +26,8 @@ public class WebSecurityConfiguration {
         return http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/authenticate", "/signup", "/order/**").permitAll()
-                .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/authenticate", "/signup").permitAll()
+                .requestMatchers("/api/**","/admin/**", "/customer/**", "/api/customer/**","/api/customer/review**").authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

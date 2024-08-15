@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ecomerce.shop.business.services.CustomerProductService;
+import com.example.ecomerce.shop.web.dto.ProductDetailDto;
 import com.example.ecomerce.shop.web.dto.ProductDto;
 
 import lombok.RequiredArgsConstructor;
@@ -17,17 +19,28 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("api/customer")
 @RequiredArgsConstructor
 public class CustomerProductController {
-    private final  CustomerProductService customerProductService;
+    private final CustomerProductService customerProductService;
 
-     @GetMapping("/products")
+    @GetMapping("/products")
     public ResponseEntity<List<ProductDto>> getAllProducts() {
         List<ProductDto> productDtos = customerProductService.getAllProducts();
         return ResponseEntity.ok(productDtos);
     }
 
     @GetMapping("/products/search")
-public ResponseEntity<List<ProductDto>> getAllProductByName(@RequestParam String name) {
-    List<ProductDto> productDtos = customerProductService.getProductByName(name);
-    return ResponseEntity.ok(productDtos);
-}
+    public ResponseEntity<List<ProductDto>> getAllProductByName(@RequestParam String name) {
+        List<ProductDto> productDtos = customerProductService.getProductByName(name);
+        return ResponseEntity.ok(productDtos);
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<ProductDetailDto> getProductDetailsById(@PathVariable Long productId) {
+        ProductDetailDto productDetailDto=customerProductService.getProductDetailId(productId);
+        if (productDetailDto==null)return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(productDetailDto);
+            
+        
+        
+    }
+
 }

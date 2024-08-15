@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.ecomerce.shop.dao.entity.CartItems;
 
 public interface CartItemsRepository extends JpaRepository<CartItems,Long> {
-    Optional<CartItems> findByProductIdAndOrderIdAndUserId (Long prouctId, Long orderId,Long userId );
+    Optional<CartItems> findByProductIdAndOrderIdAndUserId(Long productId, Long orderId, Long userId);
+     CartItems findByUserId(Long userId);
 }

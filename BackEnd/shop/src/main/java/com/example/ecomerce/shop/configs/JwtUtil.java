@@ -1,24 +1,33 @@
 package com.example.ecomerce.shop.configs;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET = "12345678901234567890123456789012"; // Make sure the secret key is 256 bits (32 characters)
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    private Key getSignKey() {
+        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        return new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
+    }
 
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
@@ -34,12 +43,6 @@ public class JwtUtil {
                    .signWith(getSignKey(), SignatureAlgorithm.HS256)
                    .compact();
     }
-
-private Key getSignKey() {
-    byte[] keyBytes = SECRET.getBytes(StandardCharsets.UTF_8);  // Ensure the secret key is correctly converted to bytes
-    return Keys.hmacShaKeyFor(keyBytes);
-}
-
 
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);

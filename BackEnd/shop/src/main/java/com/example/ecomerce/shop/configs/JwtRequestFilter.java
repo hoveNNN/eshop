@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @RequiredArgsConstructor
@@ -23,16 +25,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final JwtUtil jwtUtil;
+    private static final Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
         String token = null;
         String userName = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            userName = jwtUtil.extractUserName(token);
+            try {
+                userName = jwtUtil.extractUserName(token);
+            } catch (Exception e) {
+                logger.error("JWT Token extraction error: {}", e.getMessage());
+            }
         }
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -42,6 +49,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                logger.warn("Invalid JWT Token");
             }
         }
 

@@ -10,11 +10,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ecomerce.shop.business.services.AdminProductService;
+import com.example.ecomerce.shop.business.services.FAQService;
+import com.example.ecomerce.shop.web.dto.FAQDto;
 import com.example.ecomerce.shop.web.dto.ProductDto;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminProductController {
 
     private final AdminProductService adminProductService;
+     private final FAQService faqService;
 
     @PostMapping("/product")
     public ResponseEntity<ProductDto> addProduct(@ModelAttribute ProductDto productDto) throws IOException {
@@ -49,4 +54,33 @@ public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
     adminProductService.deleteProduct(id);
     return ResponseEntity.noContent().build();
 }
+
+@PostMapping("/faq/{productId}")
+public  ResponseEntity<FAQDto> postFAQ(@PathVariable Long productId, @RequestBody FAQDto faqDto){
+    return ResponseEntity.status(HttpStatus.CREATED).body(faqService.postFAQ(productId, faqDto));
+
+}
+
+@GetMapping("/product/{productId}")
+public ResponseEntity<ProductDto>getProductById(@PathVariable Long productId){
+    ProductDto productDto=adminProductService.getProductById(productId);
+    if(productDto!=null){
+        return ResponseEntity.ok(productDto);
+    }else{
+        return ResponseEntity.notFound().build();
+    }
+}
+
+@PutMapping("/product/{productId}")
+public ResponseEntity<ProductDto>updateProduct(@PathVariable Long productId,@ModelAttribute ProductDto productDto){
+    ProductDto updatedProduct=adminProductService.updateProduct(productId,productDto);
+    if(updatedProduct!=null){
+        return ResponseEntity.ok(updatedProduct);
+    }else{
+        return ResponseEntity.notFound().build();
+    }
+}
+
+
+
 }

@@ -10,4 +10,6 @@ public interface AdminProductService {
      public List<ProductDto> getAllProducts();
      public List<ProductDto> getProductByName(String name) ;
      public void deleteProduct(Long id) ;
+     ProductDto  getProductById(Long productId);
+     ProductDto updateProduct(Long productId,ProductDto productDto);
 }

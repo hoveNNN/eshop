@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.example.ecomerce.shop.dao.enums.OrderStatus;
+import com.example.ecomerce.shop.web.dto.OrderDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -13,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -20,7 +22,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "order")
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -33,13 +35,33 @@ public class Order {
     private String payment;
     private OrderStatus orderStatus;
     private Long totalAmount;
-    private Long disount;
+    private Long discount;
     private UUID trackingId;
 
+   @ManyToOne(cascade = CascadeType.MERGE)
+@JoinColumn(name = "user_id", referencedColumnName = "id")
+private User user;
+
     @OneToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @JoinColumn(name = "coupon_id", referencedColumnName = "id")
+    private Coupon coupon;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "order")
     private List<CartItems>cartItems;
+
+    public OrderDto getOrderDto(){
+        OrderDto orderDto= new OrderDto();
+        orderDto.setId(Id);
+        orderDto.setOrderDescription(orderDescription);
+        orderDto.setAddress(address);
+        orderDto.setTrackingId(trackingId);
+        orderDto.setAmount(amount);
+        orderDto.setDate(date);
+        orderDto.setOrderStatus(orderStatus);
+        orderDto.setUserName(user.getUserName());
+        if(coupon!=null){
+            orderDto.setCouponName(coupon.getName());
+        }
+        return orderDto;
+    }
 }
